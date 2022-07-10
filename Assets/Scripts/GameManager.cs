@@ -3,12 +3,14 @@ using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Tanks
 {
     public class GameManager : MonoBehaviourPunCallbacks
     {
         public static GameManager instance;
+        public static GameObject localPlayer;
         string gameVersion = "1";
         void Awake()
         {
@@ -26,6 +28,7 @@ namespace Tanks
     // Start is called before the first frame update
     void Start()
         {
+            SceneManager.sceneLoaded += OnSceneLoaded;
             PhotonNetwork.GameVersion = gameVersion;
             PhotonNetwork.ConnectUsingSettings();
         }
@@ -67,6 +70,32 @@ namespace Tanks
             {
                 Debug.Log("Joined room!!");
             }
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (!PhotonNetwork.InRoom)
+            {
+                return;
+            }
+            localPlayer = PhotonNetwork.Instantiate("TankPlayer", new Vector3(0, 0, 0), Quaternion.identity, 0);
+            Debug.Log("Player Instance ID: " + localPlayer.GetInstanceID());
+        }
+
+        public static List<GameObject> GetAllObjectsOfTypeInScene<T>()
+        {
+            var objectsInScene = new List<GameObject>();
+            foreach (var go in (GameObject[])Resources.FindObjectsOfTypeAll(typeof(GameObject)))
+            {
+                //Unity內建的一些底層物件，遇到不處理。
+                if (go.hideFlags == HideFlags.NotEditable ||
+                go.hideFlags == HideFlags.HideAndDontSave)
+                    continue;
+
+                if (go.GetComponent<T>() != null)
+                    objectsInScene.Add(go);
+            }
+            return objectsInScene;
         }
 
         // Update is called once per frame
