@@ -12,8 +12,13 @@ namespace Tanks
         public static GameManager instance;
         public static GameObject localPlayer;
         string gameVersion = "1";
+        private GameObject defaultSpawnPoint;
         void Awake()
         {
+            defaultSpawnPoint = new GameObject("Default SpawnPoint");
+            defaultSpawnPoint.transform.position = new Vector3(0, 0, 0);
+            defaultSpawnPoint.transform.SetParent(transform, false);
+
             if (instance != null)
             {
                 Debug.LogErrorFormat(gameObject,
@@ -25,8 +30,8 @@ namespace Tanks
             DontDestroyOnLoad(gameObject);
             instance = this;
         }
-    // Start is called before the first frame update
-    void Start()
+        // Start is called before the first frame update
+        void Start()
         {
             SceneManager.sceneLoaded += OnSceneLoaded;
             PhotonNetwork.GameVersion = gameVersion;
@@ -78,7 +83,8 @@ namespace Tanks
             {
                 return;
             }
-            localPlayer = PhotonNetwork.Instantiate("TankPlayer", new Vector3(0, 0, 0), Quaternion.identity, 0);
+            var spawnPoint = GetRandomSpawnPoint();
+            localPlayer = PhotonNetwork.Instantiate("TankPlayer", spawnPoint.position, spawnPoint.rotation, 0);
             Debug.Log("Player Instance ID: " + localPlayer.GetInstanceID());
         }
 
@@ -98,11 +104,12 @@ namespace Tanks
             return objectsInScene;
         }
 
-        // Update is called once per frame
-        void Update()
+        private Transform GetRandomSpawnPoint()
         {
-
+            var spawnPoints = GetAllObjectsOfTypeInScene<SpawnPoint>();
+            return spawnPoints.Count == 0
+            ? defaultSpawnPoint.transform
+            : spawnPoints[Random.Range(0, spawnPoints.Count)].transform;
         }
     }
-
 }
