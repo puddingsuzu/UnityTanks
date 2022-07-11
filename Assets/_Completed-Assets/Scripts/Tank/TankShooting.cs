@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Complete
 {
-    public class TankShooting : MonoBehaviour
+    public class TankShooting : MonoBehaviourPunCallbacks
     {
         public int m_PlayerNumber = 1;              // Used to identify the different players.
         public Rigidbody m_Shell;                   // Prefab of the shell.
@@ -24,8 +24,9 @@ namespace Complete
         private bool m_Fired;                       // Whether or not the shell has been launched with this button press.
 
 
-        private void OnEnable()
+        public override void OnEnable()
         {
+            base.OnEnable();
             // When the tank is turned on, reset the launch force and the UI
             m_CurrentLaunchForce = m_MinLaunchForce;
             m_AimSlider.value = m_MinLaunchForce;
@@ -82,24 +83,41 @@ namespace Complete
         }
 
 
-        private void Fire ()
+        private void Fire()
         {
             // Set the fired flag so only Fire is only called once.
             m_Fired = true;
 
             // Create an instance of the shell and store a reference to it's rigidbody.
             Rigidbody shellInstance =
-                Instantiate (m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
+                Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
+            //呼叫遠端的client也去做發射的動作
+            photonView.RPC("FireOther", RpcTarget.Others, m_FireTransform.position, m_CurrentLaunchForce);
 
             // Set the shell's velocity to the launch force in the fire position's forward direction.
-            shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward; 
+            shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
 
-            // Change the clip to the firing clip and play it.
+            // Change the clip to the firing clip and play it. 音效
             m_ShootingAudio.clip = m_FireClip;
-            m_ShootingAudio.Play ();
+            m_ShootingAudio.Play();
 
             // Reset the launch force.  This is a precaution in case of missing button events.
             m_CurrentLaunchForce = m_MinLaunchForce;
         }
+
+
+        //作業3
+        //多傳一個子彈速度的參數，去解決子彈速度未傳遞至client的問題
+        [PunRPC]
+        private void FireOther(Vector3 pos , float shellspeed)
+        {
+            m_Fired = true;
+            Rigidbody shellInstance = Instantiate(m_Shell, pos, m_FireTransform.rotation) as Rigidbody;
+            shellInstance.velocity = shellspeed * m_FireTransform.forward;
+            m_CurrentLaunchForce = m_MinLaunchForce;
+            //m_CurrentLaunchForce
+        }
+
+
     }
 }

@@ -400,7 +400,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startSizeY:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 1
       minScalar: 1
       maxCurve:
@@ -453,7 +453,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startSizeZ:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 1
       minScalar: 1
       maxCurve:
@@ -5110,12 +5110,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3805623081900844204}
-  m_LocalRotation: {x: 0.0871554, y: 0, z: 0, w: -0.9961947}
-  m_LocalPosition: {x: 0, y: 1.7, z: 1.35}
+  m_LocalRotation: {x: 0.0871554, y: -0, z: -0, w: -0.9961947}
+  m_LocalPosition: {x: -0.000010554959, y: 0.6203588, z: 1.3753215}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 3805623081901098340}
-  m_RootOrder: 3
+  m_Father: {fileID: 3805623081901180708}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3805623081900858784
 GameObject:
@@ -5435,7 +5435,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startSizeY:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 1
       minScalar: 1
       maxCurve:
@@ -5488,7 +5488,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startSizeZ:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 1
       minScalar: 1
       maxCurve:
@@ -9915,7 +9915,7 @@ RectTransform:
   - {fileID: 3805623081887412136}
   - {fileID: 3805623081887500496}
   m_Father: {fileID: 3805623081901098340}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -10023,7 +10023,6 @@ Transform:
   - {fileID: 3805623081901195708}
   - {fileID: 3805623081901142520}
   - {fileID: 3805623081901211384}
-  - {fileID: 3805623081901125060}
   - {fileID: 3805623081887497760}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -10567,6 +10566,8 @@ GameObject:
   - component: {fileID: 3805623081901180708}
   - component: {fileID: 3805623081897695122}
   - component: {fileID: 3805623081898832898}
+  - component: {fileID: 4262446159932295823}
+  - component: {fileID: 206133019215483357}
   m_Layer: 0
   m_Name: TankTurret
   m_TagString: Untagged
@@ -10584,7 +10585,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.000010554959, y: 1.0796412, z: -0.025321364}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 3805623081901125060}
   m_Father: {fileID: 3805623081901195708}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10638,6 +10640,45 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4262446159932295823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3805623081900877610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: 206133019215483357}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &206133019215483357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3805623081900877610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
 --- !u!1 &3805623081900885136
 GameObject:
   m_ObjectHideFlags: 0
