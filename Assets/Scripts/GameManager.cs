@@ -11,8 +11,16 @@ namespace Tanks
     {
         public static GameManager instance;
         public static GameObject localPlayer;
-        string gameVersion = "1";
         private GameObject defaultSpawnPoint;
+
+        private const string MAP_PROP_KEY = "map";
+        private const string GAME_MODE_PROP_KEY = "gm";
+        private const string AI_PROP_KEY = "ai";
+
+        private TypedLobby customLobby = new TypedLobby("race", LobbyType.Default);
+        private Dictionary<string, RoomInfo> cachedRoomList = new Dictionary<string, RoomInfo>();
+
+        string gameVersion = "1";
         void Awake()
         {
             defaultSpawnPoint = new GameObject("Default SpawnPoint");
@@ -30,12 +38,55 @@ namespace Tanks
             DontDestroyOnLoad(gameObject);
             instance = this;
         }
+
+        public void JoinLobby()
+        {
+            PhotonNetwork.JoinLobby(customLobby);
+        }
+        private void UpdateCachedRoomList(List<RoomInfo> roomList)
+        {
+            for (int i = 0; i < roomList.Count; i++)
+            {
+                RoomInfo info = roomList[i];
+                if (info.RemovedFromList)
+                    cachedRoomList.Remove(info.Name);
+                else
+                    cachedRoomList[info.Name] = info;
+            }
+        }
+        
+        public void CreateGame(int map, int gameMode)
+        {
+            var roomOptions = new RoomOptions();
+            roomOptions.CustomRoomPropertiesForLobby = new[] { MAP_PROP_KEY, GAME_MODE_PROP_KEY, AI_PROP_KEY };
+            roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable
+            {
+            { MAP_PROP_KEY, map },
+            { GAME_MODE_PROP_KEY, gameMode }
+            };
+            roomOptions.MaxPlayers = 4;
+            PhotonNetwork.CreateRoom(null, roomOptions, null);
+        }
+        public void JoinRandomGame(int map, int gameMode)
+        {
+            byte expectedMaxPlayers = 0;
+            var expectedCustomRoomProperties = new ExitGames.Client.Photon.Hashtable
+            {
+            { MAP_PROP_KEY, map },
+            { GAME_MODE_PROP_KEY, gameMode }
+            };
+            PhotonNetwork.JoinRandomRoom(expectedCustomRoomProperties, expectedMaxPlayers);
+        }
         // Start is called before the first frame update
         void Start()
         {
             SceneManager.sceneLoaded += OnSceneLoaded;
             PhotonNetwork.GameVersion = gameVersion;
-            PhotonNetwork.ConnectUsingSettings();
+        }
+        public bool ConnectToServer(string account)
+        {
+            PhotonNetwork.NickName = account;
+            return PhotonNetwork.ConnectUsingSettings();
         }
         public override void OnConnected()
         {
@@ -45,9 +96,21 @@ namespace Tanks
         {
             Debug.Log("PUN Connected to Master");
         }
+        public override void OnJoinedLobby()
+        {
+            cachedRoomList.Clear();
+        }
+        public override void OnRoomListUpdate(List<RoomInfo> roomList)
+        {
+            UpdateCachedRoomList(roomList);
+        }
+        public override void OnLeftLobby()
+        {
+            cachedRoomList.Clear();
+        }
         public override void OnDisconnected(DisconnectCause cause)
         {
-            Debug.LogWarningFormat("PUN Disconnected was called by PUN with reason {0}", cause);
+            cachedRoomList.Clear();
         }
 
         public void JoinGameRoom()
@@ -66,15 +129,15 @@ namespace Tanks
 
         public override void OnJoinedRoom()
         {
+            Debug.Log($"Joined room: {PhotonNetwork.CurrentRoom.Name}{ PhotonNetwork.CurrentRoom.CustomProperties}");
             if (PhotonNetwork.IsMasterClient)
             {
-                Debug.Log("Created room!!");
                 PhotonNetwork.LoadLevel("GameScene");
             }
-            else
-            {
-                Debug.Log("Joined room!!");
-            }
+        }
+        public override void OnJoinRandomFailed(short returnCode, string message)
+        {
+            Debug.Log($"Join Random Room Failed: ({returnCode}) {message}");
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
